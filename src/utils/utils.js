@@ -261,7 +261,7 @@ const getBoundsForGeoData = (geoData) => {
 
 const filterYearRuns = (run, year) => {
   if (run && run.start_date_local) {
-    return run.start_date_local.slice(0, 4) === year;
+    return run.start_date_local.slice(-4) === year;
   }
   return false;
 };

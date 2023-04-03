@@ -136,14 +136,13 @@ class Generator:
 
         return activity_list
 
-    def loadForMapping(self):
+    def loadForMapping(self, is_full_time=False):
         activities = (
             self.session.query(Activity)
             .filter(Activity.type.in_(MAPPING_TYPE))
             .order_by(Activity.start_date_local)
         )
         activity_list = []
-
         streak = 0
         last_date = None
         for activity in activities:
@@ -163,8 +162,20 @@ class Generator:
                 streak = 1
             activity.streak = streak
             last_date = date
-            activity_list.append(activity.to_dict())
-
+            activity_dict = activity.to_dict()
+            if is_full_time:
+            	activity_list.append(activity_dict)
+            else:
+                date_local_t = datetime.datetime.strptime(
+                    activity_dict['start_date_local'], "%Y-%m-%d %H:%M:%S")
+                start_date_format="%Y-%m-%d %H:%M:%S"
+                if activity_dict["source"] == "strava":
+                    start_date_format = "%Y-%m-%d %H:%M:%S%z"
+                date_t = datetime.datetime.strptime(activity_dict['start_date'], start_date_format)
+                activity_dict['start_date_local'] = date_local_t.strftime("%b %d,%Y") 
+                activity_dict['start_date'] = date_t.strftime("%b %d,%Y")
+                activity_list.append(activity_dict)
+                
         return activity_list
 
     def get_old_tracks_ids(self):

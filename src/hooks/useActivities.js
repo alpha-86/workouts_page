@@ -57,7 +57,7 @@ const useActivities = () => {
     }
     if (province) provinces.add(province);
     if (country) countries.add(country);
-    const year = run.start_date_local.slice(0, 4);
+    const year = run.start_date_local.slice(-4);
     years.add(year);
   });
 
