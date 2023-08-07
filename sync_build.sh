@@ -10,5 +10,9 @@ python3 scripts/gen_svg.py --from-db --title "Activity Grids" --type github --at
 python3 scripts/gen_svg.py --from-db --title "Over 10km Activities" --type grid --athlete ${WEB_ATHLETE}  --output assets/grid.svg --min-distance 10.0 --special-color yellow --special-color2 red --special-distance 20 --special-distance2 40 --use-localtime
 python3 scripts/gen_svg.py --from-db --type circular --use-localtime
 yarn build
+if [ -z $RUNNING_HTML_PATH ];then
+    RUNNING_HTML_PATH="/work/html"
+fi
+mkdir -p $RUNNING_HTML_PATH
 rm -rf ${RUNNING_HTML_PATH}
 mv public ${RUNNING_HTML_PATH}
