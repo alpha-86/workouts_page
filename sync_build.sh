@@ -13,6 +13,5 @@ yarn build
 if [ -z $RUNNING_HTML_PATH ];then
     RUNNING_HTML_PATH="/work/html"
 fi
-mkdir -p $RUNNING_HTML_PATH
-rm -rf ${RUNNING_HTML_PATH}
-mv public ${RUNNING_HTML_PATH}
+rm -rf ${RUNNING_HTML_PATH}/*
+mv public/* ${RUNNING_HTML_PATH}/
