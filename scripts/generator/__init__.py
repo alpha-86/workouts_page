@@ -1,4 +1,5 @@
 import datetime
+import os
 import sys
 
 import arrow
@@ -7,7 +8,14 @@ from config import MAPPING_TYPE
 from gpxtrackposter import track_loader
 from sqlalchemy import func
 
+from polyline_processor import filter_out
+
 from .db import Activity, init_db, update_or_create_activity
+
+from synced_data_file_logger import save_synced_data_file_list
+
+
+IGNORE_BEFORE_SAVING = os.getenv("IGNORE_BEFORE_SAVING", False)
 
 
 class Generator:
@@ -18,6 +26,7 @@ class Generator:
         self.client_id = ""
         self.client_secret = ""
         self.refresh_token = ""
+        self.only_run = False
 
     def set_strava_config(self, client_id, client_secret, refresh_token):
         self.client_id = client_id
@@ -37,7 +46,7 @@ class Generator:
         self.client.access_token = response["access_token"]
         print("Access ok")
 
-    def sync(self, force: bool = False):
+    def sync(self, force):
         self.check_access()
 
         print("Start syncing")
@@ -52,15 +61,18 @@ class Generator:
             else:
                 filters = {"before": datetime.datetime.utcnow()}
 
-        for run_activity in self.client.get_activities(**filters):
-            run_activity.source = "strava"
-            created = update_or_create_activity(self.session, run_activity)
+        for activity in self.client.get_activities(**filters):
+            if self.only_run and activity.type != "Run":
+                continue
+            if IGNORE_BEFORE_SAVING:
+                activity.summary_polyline = filter_out(activity.summary_polyline)
+            activity.source = "strava"
+            created = update_or_create_activity(self.session, activity)
             if created:
                 sys.stdout.write("+")
             else:
                 sys.stdout.write(".")
             sys.stdout.flush()
-
         self.session.commit()
 
     def sync_from_data_dir(self, data_dir, file_suffix="gpx"):
@@ -70,13 +82,19 @@ class Generator:
         if not tracks:
             print("No tracks found.")
             return
+
+        synced_files = []
+
         for t in tracks:
             created = update_or_create_activity(self.session, t.to_namedtuple())
             if created:
                 sys.stdout.write("+")
             else:
                 sys.stdout.write(".")
+            synced_files.extend(t.file_names)
             sys.stdout.flush()
+
+        save_synced_data_file_list(synced_files)
 
         self.session.commit()
 
@@ -95,12 +113,15 @@ class Generator:
             print("No tracks found.")
             return
         print("Syncing tracks '+' means new track '.' means update tracks")
+        synced_files = []
         for t in app_tracks:
             created = update_or_create_activity(self.session, t)
             if created:
                 sys.stdout.write("+")
             else:
                 sys.stdout.write(".")
+            if "file_names" in t:
+                synced_files.extend(t.file_names)
             sys.stdout.flush()
 
         self.session.commit()
@@ -116,8 +137,9 @@ class Generator:
         streak = 0
         last_date = None
         for activity in activities:
+            if self.only_run and activity.type != "Run":
+                continue
             # Determine running streak.
-            # if activity.type == "Run" or activity.type == "Walk":
             date = datetime.datetime.strptime(
                 activity.start_date_local, "%Y-%m-%d %H:%M:%S"
             ).date()
@@ -132,6 +154,8 @@ class Generator:
                 streak = 1
             activity.streak = streak
             last_date = date
+            if not IGNORE_BEFORE_SAVING:
+                activity.summary_polyline = filter_out(activity.summary_polyline)
             activity_list.append(activity.to_dict())
 
         return activity_list
