@@ -1,4 +1,3 @@
-source /home/work/.bashrc
 timestamp1=`stat -c %Y scripts/data.db`
 python3 scripts/strava_sync.py ${STRAVA_CLIENT_ID} ${STRAVA_CLIENT_SECRET} ${STRAVA_REFRESH_TOKEN}
 timestamp2=`stat -c %Y scripts/data.db`
