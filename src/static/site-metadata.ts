@@ -11,19 +11,19 @@ interface ISiteMetadataResult {
 }
 
 const data: ISiteMetadataResult = {
-  siteTitle: 'Workouts Map',
-  siteUrl: 'https://ben29.xyz',
+  siteTitle: 'Alpha's Workouts Map',
+  siteUrl: 'https://running.cqcy.host',
   logo: 'https://avatars.githubusercontent.com/u/4555697?s=460&u=97e1062227c4088db3c987146455245c6fa78441',
   description: 'Personal site and blog',
-  keywords: 'workouts, running, cycling, riding, roadtrip, hiking, swimming',
+  keywords: 'workouts, running, ski, cycling, riding, roadtrip, hiking, swimming',
   navLinks: [
     {
-      name: 'Blog',
-      url: 'https://ben29.xyz',
+      name: 'GitHub',
+      url: 'https://github.com/alpha-86',
     },
     {
       name: 'About',
-      url: 'https://github.com/ben-29/workouts_page/blob/master/README-CN.md',
+      url: 'https://github.com/alpha-86',
     },
   ],
 };
