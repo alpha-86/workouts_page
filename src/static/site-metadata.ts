@@ -11,7 +11,7 @@ interface ISiteMetadataResult {
 }
 
 const data: ISiteMetadataResult = {
-  siteTitle: 'Alpha's Workouts Map',
+  siteTitle: 'Alpha\'s Workouts Map',
   siteUrl: 'https://running.cqcy.host',
   logo: 'https://avatars.githubusercontent.com/u/4555697?s=460&u=97e1062227c4088db3c987146455245c6fa78441',
   description: 'Personal site and blog',
