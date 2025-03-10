@@ -23,7 +23,7 @@ const data: ISiteMetadataResult = {
     },
     {
       name: 'About',
-      url: 'https://github.com/alpha-86',
+      url: 'https://github.com/alpha-86/workouts_page',
     },
   ],
 };
